@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inayat Bukera – Full Stack Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #16161f;
+    --border: #1e1e2a;
+    --accent: #7fff6e;
+    --accent2: #5dd4f0;
+    --accent3: #ff8c5a;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --muted2: #3a3a4a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* CURSOR */
+  .cursor {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.18s ease;
+    opacity: 0.5;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 48px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 120px 48px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .hero-tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(127,255,110,0.08);
+    border: 1px solid rgba(127,255,110,0.2);
+    padding: 5px 14px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+  }
+  .hero-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(52px, 6vw, 90px);
+    line-height: 0.95;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+  }
+  .hero-name .line2 {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+    display: block;
+  }
+  .hero-name .line3 {
+    color: var(--accent);
+    display: block;
+  }
+  .hero-desc {
+    font-family: 'Crimson Pro', serif;
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 400px;
+    margin-bottom: 40px;
+    font-style: italic;
+    line-height: 1.6;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 28px;
+    background: var(--accent);
+    color: #0a0a0f;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-primary:hover { background: #a8ffaa; transform: translateY(-2px); }
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 28px;
+    background: transparent;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--accent2); color: var(--accent2); transform: translateY(-2px); }
+
+  /* Hero right - terminal card */
+  .hero-terminal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    animation: floatCard 4s ease-in-out infinite;
+  }
+  @keyframes floatCard {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  .terminal-title { font-size: 11px; color: var(--muted); margin-left: 8px; letter-spacing: 0.05em; }
+  .terminal-body { padding: 24px; }
+  .t-line { display: flex; gap: 12px; margin-bottom: 10px; font-size: 12px; line-height: 1.6; }
+  .t-prompt { color: var(--accent); flex-shrink: 0; }
+  .t-cmd { color: var(--text); }
+  .t-output { color: var(--muted); padding-left: 20px; margin-bottom: 10px; font-size: 12px; }
+  .t-output span { color: var(--accent2); }
+  .t-output .val { color: var(--accent3); }
+  .t-cursor { display: inline-block; width: 8px; height: 14px; background: var(--accent); animation: blink 1s infinite; vertical-align: middle; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* Background decorations */
+  .bg-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+  .blob1 { width: 500px; height: 500px; background: rgba(127,255,110,0.04); top: -100px; right: -100px; }
+  .blob2 { width: 300px; height: 300px; background: rgba(93,212,240,0.04); bottom: 0; left: 200px; }
+
+  /* SECTION COMMON */
+  section { padding: 100px 48px; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 60px;
+  }
+  .section-num {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(28px, 4vw, 42px);
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* SKILLS */
+  #skills { background: var(--surface); }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .skill-card {
+    background: var(--surface);
+    padding: 28px;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .skill-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--accent);
+    transition: height 0.3s ease;
+  }
+  .skill-card:hover { background: var(--surface2); }
+  .skill-card:hover::before { height: 100%; }
+  .skill-cat {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .skill-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    background: var(--muted2);
+    color: var(--muted);
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .skill-card:hover .tag { background: rgba(127,255,110,0.1); color: var(--accent); }
+
+  /* EXPERIENCE */
+  .exp-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-left: 1px solid var(--border);
+    margin-left: 20px;
+    padding-left: 40px;
+    position: relative;
+  }
+  .exp-item {
+    position: relative;
+    padding-bottom: 48px;
+  }
+  .exp-item::before {
+    content: '';
+    position: absolute;
+    left: -48px; top: 6px;
+    width: 12px; height: 12px;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    transition: background 0.3s;
+  }
+  .exp-item:hover::before { background: var(--accent); }
+  .exp-date {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .exp-role {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .exp-company {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .exp-bullets {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .exp-bullets li {
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    gap: 10px;
+  }
+  .exp-bullets li::before { content: '→'; color: var(--accent); flex-shrink: 0; }
+
+  /* PROJECTS */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .project-card {
+    background: var(--surface);
+    padding: 32px;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .project-card:hover { background: var(--surface2); }
+  .project-num {
+    font-size: 10px;
+    color: var(--muted2);
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+    font-family: 'Syne', sans-serif;
+  }
+  .project-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .project-type {
+    font-size: 11px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+  }
+  .project-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+  .project-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  .stack-tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border: 1px solid var(--muted2);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .project-link {
+    font-size: 11px;
+    color: var(--accent);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: gap 0.2s;
+  }
+  .project-link:hover { gap: 12px; }
+  .project-featured {
+    position: absolute;
+    top: 16px; right: 16px;
+    font-size: 9px;
+    padding: 2px 8px;
+    background: rgba(127,255,110,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(127,255,110,0.2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* EDUCATION */
+  #education { background: var(--surface); }
+  .edu-card {
+    border: 1px solid var(--border);
+    padding: 40px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: start;
+    transition: border-color 0.3s;
+  }
+  .edu-card:hover { border-color: var(--accent); }
+  .edu-degree {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .edu-school {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .cgpa-grid {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .sem-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    min-width: 52px;
+    transition: all 0.2s;
+  }
+  .sem-pill:hover { border-color: var(--accent); background: rgba(127,255,110,0.05); }
+  .sem-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .sem-score { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--accent); }
+  .edu-right { text-align: right; }
+  .edu-year { font-family: 'Syne', sans-serif; font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .cgpa-big { font-family: 'Syne', sans-serif; font-size: 64px; font-weight: 800; color: var(--text); line-height: 1; letter-spacing: -3px; }
+  .cgpa-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* CONTACT */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .contact-item {
+    background: var(--surface);
+    padding: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: background 0.2s;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+  }
+  .contact-item::after {
+    content: '↗';
+    position: absolute;
+    right: 24px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    color: var(--muted2);
+    transition: all 0.3s;
+  }
+  .contact-item:hover { background: var(--surface2); }
+  .contact-item:hover::after { color: var(--accent); right: 18px; }
+  .contact-label { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; }
+  .contact-value { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; }
+  .contact-sub { font-size: 12px; color: var(--muted); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ANIMATIONS */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    #hero { padding: 100px 24px 60px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    section { padding: 60px 24px; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .edu-card { grid-template-columns: 1fr; }
+    .edu-right { text-align: left; }
+    footer { flex-direction: column; gap: 8px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#hero">IB<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="bg-blob blob1"></div>
+  <div class="bg-blob blob2"></div>
+  <div class="hero-grid">
+    <div>
+      <div class="hero-tag">Available for opportunities</div>
+      <h1 class="hero-name">
+        INAYAT<span class="line2">BUKERA</span><span class="line3">DEV.</span>
+      </h1>
+      <p class="hero-desc">Full Stack Web Developer building real-time apps, e-commerce platforms & database-driven systems.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="#projects">View Projects →</a>
+        <a class="btn-outline" href="https://www.linkedin.com/in/inayat-bukera" target="_blank">LinkedIn ↗</a>
+        <a class="btn-outline" href="https://github.com/Inayat-dev" target="_blank">GitHub ↗</a>
+      </div>
+    </div>
+    <div class="hero-terminal">
+      <div class="terminal-header">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="terminal-title">inayat@dev ~ whoami</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line"><span class="t-prompt">❯</span><span class="t-cmd">cat profile.json</span></div>
+        <div class="t-output">
+          {<br>
+          &nbsp;&nbsp;"name": <span>"Inayat Bukera"</span>,<br>
+          &nbsp;&nbsp;"role": <span>"Full Stack Developer"</span>,<br>
+          &nbsp;&nbsp;"location": <span>"Gujarat, India"</span>,<br>
+          &nbsp;&nbsp;"cgpa": <span class="val">6.8</span>,<br>
+          &nbsp;&nbsp;"stack": [<span>"PHP"</span>, <span>"JS"</span>, <span>"MySQL"</span>],<br>
+          &nbsp;&nbsp;"status": <span>"open_to_work"</span><br>
+          }
+        </div>
+        <div class="t-line" style="margin-top:16px"><span class="t-prompt">❯</span><span class="t-cmd">ls projects/ <span class="t-cursor"></span></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-inner">
+    <div class="section-label fade-in">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Technical Skills</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="skills-grid fade-in">
+      <div class="skill-card">
+        <div class="skill-cat">Frontend</div>
+        <div class="skill-title">UI & Interface</div>
+        <div class="skill-tags">
+          <span class="tag">HTML5</span>
+          <span class="tag">CSS3</span>
+          <span class="tag">JavaScript</span>
+          <span class="tag">Bootstrap</span>
+          <span class="tag">React.js</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-cat">Backend</div>
+        <div class="skill-title">Server & Logic</div>
+        <div class="skill-tags">
+          <span class="tag">PHP</span>
+          <span class="tag">Express.js</span>
+          <span class="tag">Node.js</span>
+          <span class="tag">WebSocket</span>
+          <span class="tag">REST APIs</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-cat">Databases</div>
+        <div class="skill-title">Data Layer</div>
+        <div class="skill-tags">
+          <span class="tag">MySQL</span>
+          <span class="tag">SQLite</span>
+          <span class="tag">SQL</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-cat">Languages</div>
+        <div class="skill-title">Programming</div>
+        <div class="skill-tags">
+          <span class="tag">PHP</span>
+          <span class="tag">JavaScript</span>
+          <span class="tag">Python</span>
+          <span class="tag">SQL</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-cat">Tools & Platforms</div>
+        <div class="skill-title">Dev Ecosystem</div>
+        <div class="skill-tags">
+          <span class="tag">Git & GitHub</span>
+          <span class="tag">XAMPP</span>
+          <span class="tag">WordPress</span>
+          <span class="tag">Razorpay</span>
+          <span class="tag">Netlify CDN</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-cat">Libraries</div>
+        <div class="skill-title">Specialties</div>
+        <div class="skill-tags">
+          <span class="tag">Ratchet</span>
+          <span class="tag">WebSockets</span>
+          <span class="tag">InfinityFree</span>
+          <span class="tag">Payment Gateways</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-inner">
+    <div class="section-label fade-in">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Experience</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="exp-timeline fade-in">
+      <div class="exp-item">
+        <div class="exp-date">Jan 2025 – Mar 2025</div>
+        <div class="exp-role">Web Developer Intern</div>
+        <div class="exp-company">Rifat Enterprise · Gariyadhar, Gujarat · Building Materials Business</div>
+        <ul class="exp-bullets">
+          <li>Built a full web-based Inventory Management System using PHP and MySQL from scratch</li>
+          <li>Implemented product tracking, stock management, invoice generation, and admin panel</li>
+          <li>Simplified codebase to maintainable "fresher-level" PHP style for easy handoff</li>
+          <li>Delivered as both a functional business tool and Semester 6 final project</li>
+        </ul>
+      </div>
+      <div class="exp-item">
+        <div class="exp-date">2024</div>
+        <div class="exp-role">Freelance Web Developer</div>
+        <div class="exp-company">Alsaad Shop · Junagadh, Gujarat · E-Commerce Client</div>
+        <ul class="exp-bullets">
+          <li>Built complete e-commerce store on WordPress for a real client</li>
+          <li>Configured product catalog, user accounts, and Razorpay payment integration</li>
+          <li>Handled full project from setup to deployment independently</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-inner">
+    <div class="section-label fade-in">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Projects</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="projects-grid fade-in">
+
+      <div class="project-card">
+        <div class="project-featured">Featured</div>
+        <div class="project-num">001</div>
+        <div class="project-title">Metalink</div>
+        <div class="project-type">Real-Time Chat Application</div>
+        <div class="project-desc">Real-time one-to-one chat with WebSocket (Ratchet), friend management, story posting, and secure login/registration system.</div>
+        <div class="project-stack">
+          <span class="stack-tag">PHP</span>
+          <span class="stack-tag">JavaScript</span>
+          <span class="stack-tag">MySQL</span>
+          <span class="stack-tag">Ratchet</span>
+          <span class="stack-tag">WebSocket</span>
+        </div>
+        <a class="project-link" href="https://github.com/Inayat-dev/metalink-chat-app" target="_blank">View on GitHub →</a>
+      </div>
+
+      <div class="project-card">
+        <div class="project-featured">Featured</div>
+        <div class="project-num">002</div>
+        <div class="project-title">Flipkart Clone</div>
+        <div class="project-type">Full Stack E-Commerce</div>
+        <div class="project-desc">Complete Flipkart-style e-commerce with product listings, cart, COD with UPI advance, Razorpay, admin panel, and bulk JSON import/export. Deployed on InfinityFree with Netlify CDN.</div>
+        <div class="project-stack">
+          <span class="stack-tag">PHP</span>
+          <span class="stack-tag">MySQL</span>
+          <span class="stack-tag">Razorpay</span>
+          <span class="stack-tag">Bootstrap</span>
+          <span class="stack-tag">JavaScript</span>
+        </div>
+        <a class="project-link" href="https://github.com/Inayat-dev/flipkart-clone" target="_blank">View on GitHub →</a>
+      </div>
+
+      <div class="project-card">
+        <div class="project-num">003</div>
+        <div class="project-title">Resource Sharing Platform</div>
+        <div class="project-type">File Management Platform</div>
+        <div class="project-desc">Upload, share, and manage files with other users. Supports in-browser HTML file execution. Full user accounts and file access management.</div>
+        <div class="project-stack">
+          <span class="stack-tag">PHP</span>
+          <span class="stack-tag">MySQL</span>
+          <span class="stack-tag">JavaScript</span>
+          <span class="stack-tag">HTML</span>
+          <span class="stack-tag">CSS</span>
+        </div>
+        <a class="project-link" href="https://github.com/Inayat-dev/Resource-Sharing" target="_blank">View on GitHub →</a>
+      </div>
+
+      <div class="project-card">
+        <div class="project-num">004</div>
+        <div class="project-title">Patek Philippe</div>
+        <div class="project-type">E-Commerce Prototype</div>
+        <div class="project-desc">Luxury watch e-commerce prototype with responsive Bootstrap UI, database-driven backend, and complete product and user management system.</div>
+        <div class="project-stack">
+          <span class="stack-tag">PHP</span>
+          <span class="stack-tag">MySQL</span>
+          <span class="stack-tag">Bootstrap</span>
+          <span class="stack-tag">JavaScript</span>
+        </div>
+        <a class="project-link" href="https://github.com/Inayat-dev" target="_blank">View on GitHub →</a>
+      </div>
+
+      <div class="project-card">
+        <div class="project-num">005</div>
+        <div class="project-title">Inventory Management</div>
+        <div class="project-type">Internship Project · Rifat Enterprise</div>
+        <div class="project-desc">Production-ready inventory system for a building materials business. Product tracking, stock management, invoice generation, and full admin panel.</div>
+        <div class="project-stack">
+          <span class="stack-tag">PHP</span>
+          <span class="stack-tag">MySQL</span>
+          <span class="stack-tag">Bootstrap</span>
+          <span class="stack-tag">XAMPP</span>
+        </div>
+        <a class="project-link" href="https://github.com/Inayat-dev/Inventory-Management-System" target="_blank">View on GitHub →</a>
+      </div>
+
+      <div class="project-card">
+        <div class="project-num">006</div>
+        <div class="project-title">Financial Transactions</div>
+        <div class="project-type">Team Project</div>
+        <div class="project-desc">Team project for managing deposits and transactions. Handled frontend-backend API integration between React.js client and Express.js server.</div>
+        <div class="project-stack">
+          <span class="stack-tag">React.js</span>
+          <span class="stack-tag">Express.js</span>
+          <span class="stack-tag">Node.js</span>
+        </div>
+        <a class="project-link" href="https://github.com/Inayat-dev" target="_blank">GitHub Profile →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="section-inner">
+    <div class="section-label fade-in">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Education</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="edu-card fade-in">
+      <div>
+        <div class="edu-degree">Bachelor of Computer Applications</div>
+        <div class="edu-school">Kamani Science College, Amreli · Saurashtra University, Rajkot · 2022 – 2025</div>
+        <div class="cgpa-grid">
+          <div class="sem-pill"><div class="sem-label">Sem 1</div><div class="sem-score">7.18</div></div>
+          <div class="sem-pill"><div class="sem-label">Sem 2</div><div class="sem-score">6.55</div></div>
+          <div class="sem-pill"><div class="sem-label">Sem 3</div><div class="sem-score">6.45</div></div>
+          <div class="sem-pill"><div class="sem-label">Sem 4</div><div class="sem-score">6.55</div></div>
+          <div class="sem-pill"><div class="sem-label">Sem 5</div><div class="sem-score">7.27</div></div>
+          <div class="sem-pill"><div class="sem-label">Sem 6</div><div class="sem-score">—</div></div>
+        </div>
+      </div>
+      <div class="edu-right">
+        <div class="edu-year">Overall CGPA</div>
+        <div class="cgpa-big">6.8</div>
+        <div class="cgpa-label">out of 10.0</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-inner">
+    <div class="section-label fade-in">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Let's Connect</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="contact-grid fade-in">
+      <a class="contact-item" href="mailto:bukerainayat9737@gmail.com">
+        <div class="contact-label">Email</div>
+        <div class="contact-value">bukerainayat9737@gmail.com</div>
+        <div class="contact-sub">Send me a message</div>
+      </a>
+      <a class="contact-item" href="tel:9737801738">
+        <div class="contact-label">Phone</div>
+        <div class="contact-value">+91 97378 01738</div>
+        <div class="contact-sub">Call or WhatsApp</div>
+      </a>
+      <a class="contact-item" href="https://github.com/Inayat-dev" target="_blank">
+        <div class="contact-label">GitHub</div>
+        <div class="contact-value">github.com/Inayat-dev</div>
+        <div class="contact-sub">See all my code</div>
+      </a>
+      <a class="contact-item" href="https://www.linkedin.com/in/inayat-bukera" target="_blank">
+        <div class="contact-label">LinkedIn</div>
+        <div class="contact-value">inayat-bukera</div>
+        <div class="contact-sub">Professional profile</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>Inayat Bukera — Full Stack Developer</span>
+  <span style="color: var(--muted2)">Amreli, Gujarat, India</span>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx - 4 + 'px'; cursor.style.top = my - 4 + 'px'; });
+  function animateRing() { rx += (mx - rx - 18) * 0.12; ry += (my - ry - 18) * 0.12; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; requestAnimationFrame(animateRing); }
+  animateRing();
+  document.querySelectorAll('a, button').forEach(el => { el.addEventListener('mouseenter', () => { cursor.style.transform = 'scale(2)'; ring.style.transform = 'scale(1.5)'; ring.style.opacity = '0.3'; }); el.addEventListener('mouseleave', () => { cursor.style.transform = 'scale(1)'; ring.style.transform = 'scale(1)'; ring.style.opacity = '0.5'; }); });
+
+  // Scroll animations
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), entry.target.dataset.delay || 0);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach((el, i) => { el.dataset.delay = (i % 3) * 80; observer.observe(el); });
+
+  // Active nav highlight
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+    navLinks.forEach(a => { a.style.color = a.getAttribute('href') === '#' + current ? 'var(--text)' : ''; });
+  });
+</script>
+</body>
+</html>
