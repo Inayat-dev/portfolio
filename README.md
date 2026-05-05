@@ -2,7 +2,7 @@
 
 Personal portfolio website for **Inayat Bukera**, Full Stack Web Developer from Gujarat, India.
 
-🔗 **Live Demo**: https://inayat-dev.github.io/portfolio/ *(update after deploy)*
+🔗 **Live Demo**: https://inayat-dev.github.io/portfolio/ 
 
 ---
 
